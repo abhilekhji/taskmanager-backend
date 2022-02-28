@@ -11,7 +11,6 @@ createTask = async (req,res)=>{
             status: false,
             message: err
         });
-        console.log(err);
     }
 }
 getAllTasks = async (req,res) => {
@@ -26,13 +25,46 @@ getAllTasks = async (req,res) => {
             status: false,
             message: err
         });
-        console.log(err);
     }
 }
-getTaskById = (req,res)=>{
+getTaskById = async (req,res)=>{
     const { id } = req.params;
     try {
-        const task = await Task.find({_id: id});
+        const task = await Task.findOne({_id: id});
+        return res.status(201).json({
+            status: true,
+            data: task
+        });
+    } catch(err) {
+        res.status(500).json({
+            status: false,
+            message: err
+        });
+    }
+}
+updateTaskById = async (req,res)=>{
+    const { id } = req.params;
+    const body = req.body;
+    try {
+        const task = await Task.findOneAndUpdate({_id: id}, body, {
+            new: true,
+            runValidators: true
+        });
+        res.status(200).json({
+            status: true,
+            data: task
+        });
+    } catch(err) {
+        res.status(500).json({
+            status: false,
+            message: err
+        });
+    }
+}
+deleteTaskById = async (req,res)=>{
+    const { id } = req.params;
+    try {
+        const task = await Task.findOneAndDelete({_id: id});
         res.status(201).json({
             status: true,
             data: task
@@ -42,24 +74,7 @@ getTaskById = (req,res)=>{
             status: false,
             message: err
         });
-        console.log(err);
     }
-}
-updateTaskById = (req,res)=>{
-    const { id } = req.params;
-    res.json({
-        status: true,
-        id: parseInt(id),
-        message: "Update task by Id",
-    });
-}
-deleteTaskById = (req,res)=>{
-    const { id } = req.params;
-    res.json({
-        status: true,
-        id: parseInt(id),
-        message: "Task deleted by Id"
-    });
 }
 
 module.exports = {
