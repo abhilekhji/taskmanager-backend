@@ -1,51 +1,22 @@
+const connectDb = require('./db/connect');
+const Task = require('./models/taskManager');
 const express = require("express");
+require('dotenv').config();
 
 const app = express();
+const tasks = require('./routes/task');
 
-// Create Routes
-app.post('/createTask',(req,res)=>{
-    res.json({
-        status: true,
-        message: "New Task created"
-    });
-});
+app.use(express.json())
+app.use('/api/tasks',tasks);
 
-// Read Routes
-app.get('/getAllTasks',(req,res)=>{
-    res.json({
-        status: true,
-        message: "Get all tasks"
-    })
-});
+const port = process.env.PORT || 3000;
+const start = async () => {
+    try {
+        await connectDb(process.env.MONGO_CONNECTION)
+        app.listen(port, console.log(`The app is listening to port ${port}...`));   
+    } catch(error) {
+        console.log("Unable to connect DB : ", error);
+    }
+}
 
-app.get('/getTaskById/:id',(req,res)=>{
-    const { id } = req.params;
-    res.json({
-        status: true,
-        id: parseInt(id),
-        message: "Get task by id"
-    });
-});
-
-// Update Routes
-app.put('/updateTaskById/:id',(req,res)=>{
-    const { id } = req.params;
-    res.json({
-        status: true,
-        id: parseInt(id),
-        message: "Update task by Id"
-    });
-});
-
-// Delete Routes
-app.delete('/deleteTaskById/:id',(req,res)=>{
-    const { id } = req.params;
-    res.json({
-        status: true,
-        id: parseInt(id),
-        message: "Task deleted by Id"
-    });
-});
-
-const port = 3000;
-app.listen(port, console.log(`The app is listening to port ${port}...`));
+start();
